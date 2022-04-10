@@ -89,8 +89,8 @@ client.on("interactionCreate", async (interaction) => {
 });
 
 const deleteMintUrl = (userId) => {
+  const lock = new locker("locked.bin");
   try {
-    const lock = new locker("locked.bin");
     const users = JSON.parse(fs.readFileSync("./minted.json"));
     delete users[userId];
     fs.writeFileSync("./minted.json", JSON.stringify(users, null, 2));
@@ -103,9 +103,9 @@ const deleteMintUrl = (userId) => {
 };
 
 const getMintUrl = (userId) => {
+  let url = "";
+  const lock = new locker("locked.bin");
   try {
-    let url = "";
-    const lock = new locker("locked.bin");
     const users = JSON.parse(fs.readFileSync("./minted.json"));
     if (users[userId]) {
       url = users[userId];
