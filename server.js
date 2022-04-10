@@ -3,10 +3,12 @@ const locker = require("node-file-lock");
 const { Client, Intents } = require("discord.js");
 const http = require("http");
 
-http.createServer(function(req, res) {
-	res.write("OK");
-	res.end();
-}).listen(8080);
+http
+  .createServer(function (req, res) {
+    res.write("OK");
+    res.end();
+  })
+  .listen(8080);
 
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
@@ -35,7 +37,7 @@ client.once("ready", async () => {
 client.on("interactionCreate", async (interaction) => {
   try {
     if (!interaction.isCommand()) {
-        return;
+      return;
     }
     const { commandName } = interaction;
     //get_poap
@@ -87,32 +89,42 @@ client.on("interactionCreate", async (interaction) => {
 });
 
 const deleteMintUrl = (userId) => {
-  const lock = new locker("locked.bin");
-  const users = JSON.parse(fs.readFileSync("./minted.json"));
-  delete users[userId];
-  fs.writeFileSync("./minted.json", JSON.stringify(users, null, 2));
-  lock.unlock();
-  console.log(`${userId} reset`);
+  try {
+    const lock = new locker("locked.bin");
+    const users = JSON.parse(fs.readFileSync("./minted.json"));
+    delete users[userId];
+    fs.writeFileSync("./minted.json", JSON.stringify(users, null, 2));
+    console.log(`${userId} reset`);
+  } catch (e) {
+    console.log(e);
+  } finally {
+    lock.unlock();
+  }
 };
 
-const getMintUrl= (userId) => {
-  let url = "";
-  const lock = new locker("locked.bin");
-  const users = JSON.parse(fs.readFileSync("./minted.json"));
-  if (users[userId]) {
-    url = users[userId];
-    console.log(`${userId} ${url} Got Already`);
-  } else {
-    const str = fs.readFileSync("./list.txt", "utf-8");
-    const urls = str.split("\n");
-    url = urls.shift();
-    users[userId] = url;
-    fs.writeFileSync("./list.txt", urls.join("\n"));
-    fs.writeFileSync("./minted.json", JSON.stringify(users, null, 2));
-    console.log(`${userId} ${url}`);
+const getMintUrl = (userId) => {
+  try {
+    let url = "";
+    const lock = new locker("locked.bin");
+    const users = JSON.parse(fs.readFileSync("./minted.json"));
+    if (users[userId]) {
+      url = users[userId];
+      console.log(`${userId} ${url} Got Already`);
+    } else {
+      const str = fs.readFileSync("./list.txt", "utf-8");
+      const urls = str.split("\n");
+      url = urls.shift();
+      users[userId] = url;
+      fs.writeFileSync("./list.txt", urls.join("\n"));
+      fs.writeFileSync("./minted.json", JSON.stringify(users, null, 2));
+      console.log(`${userId} ${url}`);
+    }
+  } catch (e) {
+    console.log(e);
+  } finally {
+    lock.unlock();
+    return url;
   }
-  lock.unlock();
-  return url;
 };
 
 (async () => {
