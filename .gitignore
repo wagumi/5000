@@ -1,0 +1,4 @@
+*.txt
+minted.json
+package-lock.json
+node_module/
