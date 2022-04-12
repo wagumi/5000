@@ -91,9 +91,9 @@ client.on("interactionCreate", async (interaction) => {
 const deleteMintUrl = (userId) => {
   const lock = new locker("locked.bin");
   try {
-    const users = JSON.parse(fs.readFileSync("./minted.json"));
+    const users = JSON.parse(fs.readFileSync(process.env.MINTED_FILE_NAME));
     delete users[userId];
-    fs.writeFileSync("./minted.json", JSON.stringify(users, null, 2));
+    fs.writeFileSync(process.env.MINTED_FILE_NAME, JSON.stringify(users, null, 2));
     console.log(`${userId} reset`);
   } catch (e) {
     console.log(e);
@@ -106,17 +106,21 @@ const getMintUrl = (userId) => {
   let url = "";
   const lock = new locker("locked.bin");
   try {
-    const users = JSON.parse(fs.readFileSync("./minted.json"));
+    const users = JSON.parse(fs.readFileSync(process.env.MINTED_FILE_NAME));
     if (users[userId]) {
       url = users[userId];
       console.log(`${userId} ${url} Got Already`);
     } else {
-      const str = fs.readFileSync("./list.txt", "utf-8");
+      const str = fs.readFileSync(process.env.LIST_FILE_NAME, "utf-8");
       const urls = str.split("\n");
-      url = urls.shift();
+      url = urls.shift(); //length == 0 then return "undefined".
+      if (!url) {
+        url = "No valid URL remains.";
+        throw url;
+      }
       users[userId] = url;
-      fs.writeFileSync("./list.txt", urls.join("\n"));
-      fs.writeFileSync("./minted.json", JSON.stringify(users, null, 2));
+      fs.writeFileSync(process.env.LIST_FILE_NAME, urls.join("\n"));
+      fs.writeFileSync(process.env.MINTED_FILE_NAME, JSON.stringify(users, null, 2));
       console.log(`${userId} ${url}`);
     }
   } catch (e) {
