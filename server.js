@@ -1,4 +1,5 @@
 const crypto = require("crypto-js");
+const fetch = require("node-fetch");
 const fs = require("fs");
 const locker = require("node-file-lock");
 const { Client, Intents } = require("discord.js");
@@ -12,7 +13,11 @@ http
   .listen(8080);
 
 const client = new Client({
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
+  intents: [
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.DIRECT_MESSAGES,
+  ],
   partials: ["MESSAGE", "CHANNEL"],
 });
 
@@ -88,6 +93,40 @@ client.on("interactionCreate", async (interaction) => {
     console.log(e);
   }
 });
+
+client.on("messageCreate", (message) => {
+  if (
+    message.channel.type == "DM" &&
+    message.attachments.size &&
+    !message.author.bot
+  ) {
+    const files = message.attachments;
+    files.map((file) => {
+      getFile(file.url).then((str) => {
+        const urls = str.split("\n");
+        let count = urls.reduce((num, url) => {
+          if (url.startsWith("http://POAP.xyz/")) {
+            const crypted_text = crypto.AES.encrypt(
+              url,
+              process.env.CRYPTO_PWD
+            ).toString();
+            fs.appendFileSync(process.env.LIST_FILE_NAME, `${crypted_text}\n`);
+            num += 1;
+          }
+          return num;
+        }, 0);
+        message.author.send(`${count}件のデータを追加しました`).then(() => {
+          console.log(`${count}件のデータを追加しました`);
+        });
+      });
+    });
+  }
+});
+
+const getFile = async (url) => {
+  const response = await fetch(url);
+  return await response.text();
+};
 
 const deleteMintUrl = (userId) => {
   const lock = new locker("locked.bin");
