@@ -1,3 +1,4 @@
+const crypto = require("crypto-js");
 const fs = require("fs");
 const locker = require("node-file-lock");
 const { Client, Intents } = require("discord.js");
@@ -93,7 +94,10 @@ const deleteMintUrl = (userId) => {
   try {
     const users = JSON.parse(fs.readFileSync(process.env.MINTED_FILE_NAME));
     delete users[userId];
-    fs.writeFileSync(process.env.MINTED_FILE_NAME, JSON.stringify(users, null, 2));
+    fs.writeFileSync(
+      process.env.MINTED_FILE_NAME,
+      JSON.stringify(users, null, 2)
+    );
     console.log(`${userId} reset`);
   } catch (e) {
     console.log(e);
@@ -108,7 +112,7 @@ const getMintUrl = (userId) => {
   try {
     const users = JSON.parse(fs.readFileSync(process.env.MINTED_FILE_NAME));
     if (users[userId]) {
-      url = users[userId];
+      url = decrypto(users[userId]);
       console.log(`${userId} ${url} Got Already`);
     } else {
       const str = fs.readFileSync(process.env.LIST_FILE_NAME, "utf-8");
@@ -120,7 +124,11 @@ const getMintUrl = (userId) => {
       }
       users[userId] = url;
       fs.writeFileSync(process.env.LIST_FILE_NAME, urls.join("\n"));
-      fs.writeFileSync(process.env.MINTED_FILE_NAME, JSON.stringify(users, null, 2));
+      fs.writeFileSync(
+        process.env.MINTED_FILE_NAME,
+        JSON.stringify(users, null, 2)
+      );
+      url = decrypto(url);
       console.log(`${userId} ${url}`);
     }
   } catch (e) {
@@ -129,6 +137,11 @@ const getMintUrl = (userId) => {
     lock.unlock();
     return url;
   }
+};
+
+const decrypto = (data) => {
+  const decrypted_text = crypto.AES.decrypt(data, process.env.CRYPTO_PWD);
+  return decrypted_text.toString(crypto.enc.Utf8);
 };
 
 (async () => {
