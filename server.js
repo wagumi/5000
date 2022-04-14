@@ -122,10 +122,10 @@ client.on("messageCreate", (message) => {
         const urls = str.split("\n");
         let count = urls.reduce((num, url) => {
           if (url.startsWith("http://POAP.xyz/")) {
-            const crypted_text = crypto.AES.encrypt(
-              url,
-              process.env.CRYPTO_PWD
-            ).toString();
+            if (url == "") {
+              return num;
+            }
+            const crypted_text = encrypto(url);
             fs.appendFileSync(process.env.LIST_FILE_NAME, `${crypted_text}\n`);
             num += 1;
           }
@@ -151,7 +151,17 @@ const countUrls = () => {
   try {
     const str = fs.readFileSync(process.env.LIST_FILE_NAME, "utf-8");
     const tmp = str.split("\n");
-    const urls = Array.from(new Set(tmp));
+    const items = [];
+    tmp.map((item) => {
+      items.push(decrypto(item));
+    });
+    const results = Array.from(new Set(items));
+
+    const urls = [];
+    results.map((item) => {
+      urls.push(encrypto(item));
+    });
+
     fs.writeFileSync(process.env.LIST_FILE_NAME, urls.join("\n"));
     return urls.length - 1;
   } catch (e) {
@@ -215,6 +225,14 @@ const getMintUrl = (userId) => {
 const decrypto = (data) => {
   const decrypted_text = crypto.AES.decrypt(data, process.env.CRYPTO_PWD);
   return decrypted_text.toString(crypto.enc.Utf8);
+};
+
+const encrypto = (data) => {
+  if (data == "") {
+    return "";
+  }
+  const crypted_text = crypto.AES.encrypt(data, process.env.CRYPTO_PWD);
+  return crypted_text.toString();
 };
 
 (async () => {
