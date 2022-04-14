@@ -100,7 +100,7 @@ client.on("messageCreate", (message) => {
     message.attachments.size &&
     !message.author.bot
   ) {
-    if (message.author.id !== "488544515976724480") {
+    if (!process.env.LIST_FILE_ADMIN.includes(message.author.id)) {
       const msg = `${message.author.username}<${message.author.id}>にはURLを追加する権限がありません`;
       message.author.send(msg).then(() => {
         console.log(msg);
