@@ -100,6 +100,21 @@ client.on("messageCreate", (message) => {
     message.attachments.size &&
     !message.author.bot
   ) {
+    if (message.author.id !== "488544515976724480") {
+      const msg = `${message.author.username}<${message.author.id}>にはURLを追加する権限がありません`;
+      message.author.send(msg).then(() => {
+        console.log(msg);
+      });
+      return;
+    }
+
+    if (message.content === "RESET") {
+      fs.writeFileSync(process.env.LIST_FILE_NAME, "");
+      const msg = `${process.env.LIST_FILE_NAME}は初期化されました`;
+      message.author.send(msg).then(() => {
+        console.log(msg);
+      });
+    }
     const files = message.attachments;
     files.map((file) => {
       getFile(file.url).then((str) => {
