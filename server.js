@@ -95,51 +95,57 @@ client.on("interactionCreate", async (interaction) => {
 });
 
 client.on("messageCreate", (message) => {
-  if (
-    message.channel.type == "DM" &&
-    message.attachments.size &&
-    !message.author.bot
-  ) {
-    if (!process.env.LIST_FILE_ADMIN.includes(message.author.id)) {
-      const msg = `${message.author.username}<${message.author.id}>にはURLを追加する権限がありません`;
-      message.author.send(msg).then(() => {
-        console.log(msg);
-      });
-      return;
-    }
-
-    if (message.content === "RESET") {
-      fs.writeFileSync(process.env.LIST_FILE_NAME, "");
-      const msg = `${process.env.LIST_FILE_NAME}は初期化されました`;
-      message.author.send(msg).then(() => {
-        console.log(msg);
-      });
-    }
-    const files = message.attachments;
-    files.map((file) => {
-      if (!file.url.endsWith(".txt")) return;
-      getFile(file.url).then((str) => {
-        const urls = str.split("\n");
-        let count = urls.reduce((num, url) => {
-          if (url.startsWith("http://POAP.xyz/")) {
-            if (url == "") {
-              return num;
-            }
-            const crypted_text = encrypto(url);
-            fs.appendFileSync(process.env.LIST_FILE_NAME, `${crypted_text}\n`);
-            num += 1;
-          }
-          return num;
-        }, 0);
-        const total = JSON.parse(countUrls());
-        console.log(total);
-        const added = total.after - total.before + count;
-        const msg = `${count}件中、${added}件のデータを追加しました。総件数:${total.after}件`;
+  try {
+    if (
+      message.channel.type == "DM" &&
+      message.attachments.size &&
+      !message.author.bot
+    ) {
+      if (!process.env.LIST_FILE_ADMIN.includes(message.author.id)) {
+        const msg = `${message.author.username}<${message.author.id}>にはURLを追加する権限がありません`;
         message.author.send(msg).then(() => {
           console.log(msg);
         });
+        return;
+      }
+
+      if (message.content === "RESET") {
+        fs.writeFileSync(process.env.LIST_FILE_NAME, "");
+        const msg = `${process.env.LIST_FILE_NAME}は初期化されました`;
+        message.author.send(msg).then(() => {
+          console.log(msg);
+        });
+      }
+      const files = message.attachments;
+      files.map((file) => {
+        if (!file.url.endsWith(".txt")) return;
+        getFile(file.url).then((str) => {
+          const urls = str.split("\n");
+          let count = urls.reduce((num, url) => {
+            if (url.startsWith("http://POAP.xyz/")) {
+              if (url == "") {
+                return num;
+              }
+              const crypted_text = encrypto(url);
+              fs.appendFileSync(
+                process.env.LIST_FILE_NAME,
+                `${crypted_text}\n`
+              );
+              num += 1;
+            }
+            return num;
+          }, 0);
+          const total = JSON.parse(countUrls());
+          const added = total.after - total.before + count;
+          const msg = `${count}件中、${added}件のデータを追加しました。総件数:${total.after}件`;
+          message.author.send(msg).then(() => {
+            console.log(msg);
+          });
+        });
       });
-    });
+    }
+  } catch (e) {
+    console.log(e);
   }
 });
 
