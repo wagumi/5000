@@ -130,8 +130,9 @@ client.on("messageCreate", (message) => {
           }
           return num;
         }, 0);
-        message.author.send(`${count}件のデータを追加しました`).then(() => {
-          console.log(`${count}件のデータを追加しました`);
+        const msg = `${count}件のデータを追加しました`;
+        message.author.send(msg).then(() => {
+          console.log(msg);
         });
       });
     });
