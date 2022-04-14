@@ -117,6 +117,7 @@ client.on("messageCreate", (message) => {
     }
     const files = message.attachments;
     files.map((file) => {
+      if (!file.url.endsWith(".txt")) return;
       getFile(file.url).then((str) => {
         const urls = str.split("\n");
         let count = urls.reduce((num, url) => {
@@ -130,7 +131,8 @@ client.on("messageCreate", (message) => {
           }
           return num;
         }, 0);
-        const msg = `${count}件のデータを追加しました`;
+        const total = countUrls();
+        const msg = `${count}件のデータを追加しました。総件数:${total}件`;
         message.author.send(msg).then(() => {
           console.log(msg);
         });
@@ -142,6 +144,22 @@ client.on("messageCreate", (message) => {
 const getFile = async (url) => {
   const response = await fetch(url);
   return await response.text();
+};
+
+const countUrls = () => {
+  const lock = new locker("locked.bin");
+  try {
+    const str = fs.readFileSync(process.env.LIST_FILE_NAME, "utf-8");
+    const tmp = str.split("\n");
+    const urls = Array.from(new Set(tmp));
+    fs.writeFileSync(process.env.LIST_FILE_NAME, urls.join("\n"));
+    return urls.length - 1;
+  } catch (e) {
+    console.log(e);
+    return -1;
+  } finally {
+    lock.unlock();
+  }
 };
 
 const deleteMintUrl = (userId) => {
