@@ -131,8 +131,10 @@ client.on("messageCreate", (message) => {
           }
           return num;
         }, 0);
-        const total = countUrls();
-        const msg = `${count}件のデータを追加しました。総件数:${total}件`;
+        const total = JSON.parse(countUrls());
+        console.log(total);
+        const added = total.after - total.before + count;
+        const msg = `${count}件中、${added}件のデータを追加しました。総件数:${total.after}件`;
         message.author.send(msg).then(() => {
           console.log(msg);
         });
@@ -163,10 +165,9 @@ const countUrls = () => {
     });
 
     fs.writeFileSync(process.env.LIST_FILE_NAME, urls.join("\n"));
-    return urls.length - 1;
+    return `{"before":${tmp.length - 1},"after":${urls.length - 1}}`;
   } catch (e) {
-    console.log(e);
-    return -1;
+    throw e;
   } finally {
     lock.unlock();
   }
