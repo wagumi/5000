@@ -42,7 +42,7 @@ client.once("ready", async () => {
 
 client.on("interactionCreate", async (interaction) => {
   try {
-    if (!interaction.isCommand()) {
+    if (!interaction.isCommand() && !interaction.isContextMenu()) {
       return;
     }
     const { commandName } = interaction;
@@ -64,7 +64,20 @@ client.on("interactionCreate", async (interaction) => {
         const userId = interaction.user.id;
         deleteMintUrl(userId);
         await interaction.reply({
-          content: "MINT has been reset.",
+          content: "URL発行履歴をリセットしました。",
+          ephemeral: true,
+        });
+      } catch (e) {
+        console.log(e);
+      }
+      //reset
+    } else if (commandName === "reset") {
+      try {
+        const userId = interaction.targetId;
+        const userName = await client.users.fetch(userId);
+        deleteMintUrl(userId);
+        await interaction.reply({
+          content: `${userName}のURL発行履歴をリセットしました。`,
           ephemeral: true,
         });
       } catch (e) {
@@ -74,9 +87,10 @@ client.on("interactionCreate", async (interaction) => {
     } else if (commandName === "reset_user") {
       try {
         const userId = interaction.options.getUser("user").id;
+        const userName = await client.users.fetch(userId);
         deleteMintUrl(userId);
         await interaction.reply({
-          content: "MINT has been reset.",
+          content: `${userName}のURL発行履歴をリセットしました。`,
           ephemeral: true,
         });
       } catch (e) {
