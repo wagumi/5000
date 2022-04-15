@@ -47,7 +47,7 @@ client.on("interactionCreate", async (interaction) => {
     }
     const { commandName } = interaction;
     //get_poap
-    if (commandName === "get_poap") {
+    if (commandName === "get_poap" || commandName === "GET POAP URL") {
       try {
         const userId = interaction.user.id;
         const url = getMintUrl(userId);
@@ -71,7 +71,7 @@ client.on("interactionCreate", async (interaction) => {
         console.log(e);
       }
       //reset
-    } else if (commandName === "reset") {
+    } else if (commandName === "RESET URL") {
       try {
         const userId = interaction.targetId;
         const userName = await client.users.fetch(userId);

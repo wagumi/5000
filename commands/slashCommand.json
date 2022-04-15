@@ -11,26 +11,31 @@
     "description": "Reset mint status.(for dev only)",
     "default_permission": true
   },
-  {
-    "name": "reset",
+	{
+    "name": "RESET URL",
     "type": "USER",
     "default_permission": true
   },
-  {
+	{
+    "name": "GET POAP URL",
+    "type": "MESSAGE",
+    "default_permission": true
+  },
+	{
     "name": "reset_user",
     "type": "CHAT_INPUT",
     "description": "Reset mint status of specify user.(for admin only)",
-    "default_permission": false,
-    "options": [
-      {
-        "type": "USER",
-        "name": "user",
-        "description": "Specify user to reset.",
-        "required": true
-      }
-    ]
-  },
-  {
+    "default_permission": true,
+		"options": [
+			{
+				"type": "USER",
+				"name": "user",
+				"description": "Specify user to reset.",
+				"required": true
+			}
+		]
+	},	
+	{
     "name": "get_poap",
     "type": "CHAT_INPUT",
     "description": "Return POAP mint url.",
