@@ -2,7 +2,7 @@ const crypto = require("crypto-js");
 const fetch = require("node-fetch");
 const fs = require("fs");
 const locker = require("node-file-lock");
-const { Client, Intents } = require("discord.js");
+const { Client, Intents, MessageEmbed } = require("discord.js");
 const http = require("http");
 
 http
@@ -51,8 +51,22 @@ client.on("interactionCreate", async (interaction) => {
       try {
         const userId = interaction.user.id;
         const url = getMintUrl(userId);
+        const embed = new MessageEmbed();
+        embed.setTitle("祝 5000メンバー");
+        embed.setColor("#7289da");
+        embed.setDescription("記念と感謝の証としてPOAPを進呈いたします。");
+        embed.setThumbnail(
+          "https://pbs.twimg.com/profile_images/1465762338871644162/nYSe4c4G_400x400.jpg"
+        );
+        embed.setImage(
+          "https://cdn.discordapp.com/attachments/914988919362293760/962953059854602240/unknown.png"
+        );
+        embed.addField("あなたのPOAP発行URL", url);
+        embed.addField("POAPを受け取るまでの流れ", "http://www.google.com");
+        embed.addField("問い合わせ", "@ukishima @araimono.KaiWai");
+
         await interaction.reply({
-          content: url,
+          embeds: [embed],
           ephemeral: true,
         });
       } catch (e) {
@@ -212,6 +226,7 @@ const deleteMintUrl = (userId) => {
 
 const getMintUrl = (userId) => {
   let url = "";
+  let embed_json;
   const lock = new locker("locked.bin");
   try {
     const users = JSON.parse(fs.readFileSync(process.env.MINTED_FILE_NAME));
@@ -233,7 +248,6 @@ const getMintUrl = (userId) => {
         JSON.stringify(users, null, 2)
       );
       url = decrypto(url);
-      console.log(`${userId} ${url}`);
     }
   } catch (e) {
     console.log(e);
