@@ -62,23 +62,11 @@ client.on("interactionCreate", async (interaction) => {
           "https://cdn.discordapp.com/attachments/914988919362293760/962953059854602240/unknown.png"
         );
         embed.addField("あなたのPOAP発行URL", url);
-        embed.addField("POAPを受け取るまでの流れ", "http://www.google.com");
-        embed.addField("問い合わせ", "@ukishima @araimono.KaiWai");
+        embed.addField("POAPを受け取るまでの流れ", "https://bit.ly/38XLWV0");
+        embed.addField("問い合わせ", "@ukishima @araimono.eth @Team Community");
 
         await interaction.reply({
           embeds: [embed],
-          ephemeral: true,
-        });
-      } catch (e) {
-        console.log(e);
-      }
-      //reset_mint
-    } else if (commandName === "reset_mint") {
-      try {
-        const userId = interaction.user.id;
-        deleteMintUrl(userId);
-        await interaction.reply({
-          content: "URL発行履歴をリセットしました。",
           ephemeral: true,
         });
       } catch (e) {

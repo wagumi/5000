@@ -5,16 +5,10 @@
     "description": "Return pong.",
     "default_permission": true
   },
-  {
-    "name": "reset_mint",
-    "type": "CHAT_INPUT",
-    "description": "Reset mint status.(for dev only)",
-    "default_permission": true
-  },
 	{
     "name": "RESET URL",
     "type": "USER",
-    "default_permission": true
+    "default_permission": false
   },
 	{
     "name": "GET POAP URL",
@@ -25,7 +19,7 @@
     "name": "reset_user",
     "type": "CHAT_INPUT",
     "description": "Reset mint status of specify user.(for admin only)",
-    "default_permission": true,
+    "default_permission": false,
 		"options": [
 			{
 				"type": "USER",
