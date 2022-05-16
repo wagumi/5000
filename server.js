@@ -25,8 +25,9 @@ client.once("ready", async () => {
   const data = require("./commands/slashCommand.json");
   const commands = await client.guilds.cache
     .get(process.env.SERVER_ID)
-    .commands.set(data);
-
+    .commands.set([]);
+    //.commands.set(data);
+	/*
   const commandPermissions = require("./commands/commandPermission.json");
   commands.map(async (command) => {
     console.log(command.id, command.name);
@@ -37,14 +38,25 @@ client.once("ready", async () => {
         permissions: commandPermissions,
       });
   });
+	*/
   console.log("Ready!");
 });
 
 client.on("interactionCreate", async (interaction) => {
   try {
+		console.log("call");
     if (!interaction.isCommand() && !interaction.isContextMenu()) {
       return;
     }
+		const time = Date.now();
+		if(time < 1651200300000 && !process.env.LIST_FILE_ADMIN.includes(interaction.user.id)){
+			await interaction.reply({
+        content: "用意されていたPOAP獲得用URLはすべて発行されました。NO URL REMAINS.",
+        ephemeral: true,
+      });
+			return;
+		}
+		
     const { commandName } = interaction;
     //get_poap
     if (commandName === "get_poap" || commandName === "GET POAP URL") {
