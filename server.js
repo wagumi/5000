@@ -25,8 +25,8 @@ client.once("ready", async () => {
   const data = require("./commands/slashCommand.json");
   const commands = await client.guilds.cache
     .get(process.env.SERVER_ID)
-    .commands.set([]);
-    //.commands.set(data);
+    .commands.set(data);
+    //.commands.set([]);
 	/*
   const commandPermissions = require("./commands/commandPermission.json");
   commands.map(async (command) => {
